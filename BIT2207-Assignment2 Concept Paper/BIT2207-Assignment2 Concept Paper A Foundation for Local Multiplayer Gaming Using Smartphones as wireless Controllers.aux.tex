@@ -1,0 +1,181 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{a4paper}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\title{A Foundation for Local Multiplayer Gaming Using Smartphones as Wireless Controllers}
+\author{Authored by Group 107 (DAY)}
+\date{}
+\setlength{\topmargin}{-1cm}
+\begin{document}
+\maketitle
+\section{Abstract}
+The purpose of this theory is to give an in-depth technological analysis of a multiplayer local video gaming system designed to let players use their smartphones as controllers, rather than the traditional gaming controllers. The system consists of two interconnected parts: a program (video game) running on a personal computer that acts as a game console, and a smartphone application that turns phones into game controllers, enabling the user to interact with the game in new, creative and exciting ways.
+
+
+\section{Introduction}
+In today's modern society most people have access to a smartphone \cite{key:1}. While many use their
+smartphones for introverted activities such as surfing the web or messaging distant friends,
+surprisingly few applications allow individuals to use their phone to engage with others in the
+same physical space.
+
+This situation is problematic for several reasons. Perhaps most noticeably, smartphones can serve
+as an excuse not to participate in discussions and other types of face to face interaction. A
+worrying example is the interaction and responsiveness between parents and their children,
+which might suffer due to excessive smartphone usage \cite{key:2}. We aim to improve upon the situation
+by creating a virtual gaming system, where smartphones are used as the controllers and a
+computer acts as the console. This will allow smartphones to be used for social activities and
+might even strengthen the bonds of parents and children if they play together.
+
+
+\subsection{Muse and enthusiasm}
+There are already products on the market that provide similar ways of controlling video games such as the Nintendo Wii U gamepad, Xbox SmartGlass (a companion application for the Xbox
+360 and Xbox One video game consoles. Xbox SmartGlass allows players to control console
+applications using a smartphone or tablet).
+
+Unlike the Xbox SmartGlass application, our console makes the phone the primary input device,
+and unlike Wii U’s gamepad that only one player in the group can use, our system allows each
+player to have their own screen. This opens up for new and more innovative ways for the users to
+interact with the games. Furthermore, people carry their smartphones with them at all times,
+ensuring there will be enough controllers available to meet the demand.
+
+
+\subsection{Scope and contributions} 
+Smartphones and computers come in many varieties, with different hardware and software
+configurations. In order to serve a broad audience it is important to build a general platform that
+can accommodate as many devices as possible. The aim of this project is to build a proof of
+concept platform. Thus, we only consider the Android operating system on the mobile side and
+the Microsoft Windows operating system on the computer. However, in the future we want the
+system to be platform independent.
+
+This project has two main contributions. The design and development of the system (Chapter
+3) and the implementation of the platform (Chapter 4). Each of these contributions will be addressed in the following chapters.
+
+\section{Design and Development} 
+This chapter describes the design of the platform architecture, followed by an brief discussion
+of what libraries and languages are used, and why.
+
+\subsection{Designing a platform}
+The design decisions that are made when designing the platform are discussed in this section. It
+contains the requirements of the system as well as a motivation for using remote code execution
+(RCE) and how it is realized on the platform.
+
+There are several hardware components in a smartphone which make it an interesting input
+device for games. The touch screen, accelerometer and camera all present different opportunities
+in terms of user interaction. Thus, a functional requirement of the system is to be able to read
+input from a number of hardware types, including the ones mentioned above and more. The
+system also needs a way to present contextual information on the touch screen.
+
+In order to cater for different types of smart phones, with different operating systems, the design
+of the system needs to be created with platform-independence in mind. To better accommodate
+the needs of the intended audience (attendants of a social event); it is of utter importance that the
+process of setting up and starting a game is as quick and simple as possible.
+Given the requirements presented above, a basic system architecture can be created. A
+fundamental version of the mobile application needs to:
+\begin{itemize}
+\itemConnect to the game console (in our case, the computer)
+\itemTransmit input information
+\item Show graphical user interface
+\end{itemize}
+
+\subsection{Remote code execution}
+In this subsection we will discuss what remote code execution is and how the platform makes use
+of it. 
+
+The server is responsible for managing all game and controller logic, as well as the graphical
+interfaces for both the server and the smartphone controllers. The parts of the code that concern
+the smartphone controllers will (once a connection between the player's phone and the server has
+been established) be sent over the connection, received by the phone and executed directly
+afterwards.
+This process, where code is first sent from one computer to another, and then executed, is
+commonly referred to as remote code execution, or RCE in short \cite{key:3}. It is a fairly well-known
+method which can and has been used to perform potentially illegal actions in poorly secured IT
+systems. There are of course legitimate, non-malicious, applications for RCE as well. A good
+example of this is online systems for learning new programming languages. The user in such a
+system is typically asked to enter some lines of code in the relevant language, which is then sent
+and executed on the server, yielding a result which is then sent back to the user. This makes it
+possible to get a hands-on experience with a language, without having to install a compiler,
+virtual machine or other additional software on the computer. An example of such a system is
+Try Clojure \cite{key:4}.
+
+
+\section{Platform}
+This chapter describes the core of the platform, starting with what is perhaps the most critical
+part - the network. It doesn't talk much about the Simple Data Language used for serialization, and
+ the game related technologies concerning graphics and sound. 
+
+\subsection{Network}
+One of the most, if not the most important part of the platform, is the network implementation.
+This section will discuss the various methods and problems associated with implementing a local
+client-server model, based on synchronous and asynchronous usage of the transmission control
+protocol (TCP).
+
+\subsubsection{Client-server model}
+A goal of the project is for the computer to emulate a video game console and the smartphones to
+emulate game controllers. The controllers of normal video game consoles do not communicate
+with each other. This applies to our system as well, and leads to a classic client-server network
+model. The computer (the console) acts as the server and the smartphones (the controllers) act as
+clients. Given this there is no direct communication between the phones. Any possible phone to
+phone communication has to go via the computer. In the network section, the word client refers
+to a smartphone connected to the local network and server refers to the computer in the local
+network which the clients connect to.
+
+\subsubsection{Bluetooth versus Wi-Fi}
+The computer and the phones need to be connected wirelessly in order for gameplay to be
+practical. There are two major competing standards for consumer grade wireless communication,
+Wi-Fi and Bluetooth. Both of them have their distinct advantages and disadvantages which we
+present below.
+\begin{enumerate}
+\item  While Bluetooth is available in most laptops, it is not available in all desktop computers.
+Even if a desktop computer does not support Wi-Fi, it is probably connected to a router in
+the local wireless network via an Ethernet cable, and can thus be connected to. Therefore,
+Wi-Fi is more prevalent than Bluetooth.
+
+\item Bluetooth uses different protocols than the ones given by the Internet Standard (the
+protocols in use on Wi-Fi). These protocols are less documented and harder to find
+tutorials for.
+
+\item Bluetooth handles server discovery through the somewhat cumbersome Bluetooth pairing
+process. Such a process does not exist on Wi-Fi and has to be implemented by the
+programmer herself.
+
+\item Bluetooth consumes less power \cite{key:5}.
+\end{enumerate}
+After evaluating the properties of the two technologies, we came to the conclusion that Wi-Fi
+was a better fit for our purposes.
+
+\section{Conclusion}
+The number of people who own smartphones is growing at a fast pace, and has been projected to
+reach 5.6 billion in 2019 \cite{key:1}. Smartphones include many advanced hardware capabilities that can
+be utilized in a large number of ways. This project aims to make use of these devices to the fullest extent possible, by creating a virtual game console which uses smartphones as controllers.
+
+There are also drawbacks with this approach. This is mainly due to the fact that smartphones lack
+many important hardware components present in modern day controllers. These include things
+like thumb sticks and hardware buttons. More avid players have come to expect these on a game
+controller making the transition awkward. However, there are many players who only play
+games on their smartphone and these players will have no problem using them on this platform.
+
+\begin{thebibliography}{9}
+
+\bibitem{key:1}
+Ericsson. (2013, November) Ericsson Mobility Report. [Online].
+http://www.ericsson.com/res/docs/2013/ericsson-mobility-report-november-2013.pdf
+\bibitem{key:2}
+Caroline J. Kistin, Barry Zuckerman, Katie Nitzberg, Jamie Gross, Margot Kaplan-Sanoff,
+Marilyn Augustyn and Michael Silverstein Jenny S. Radesky, "Patterns of Mobile Device
+Use by Caregivers and Children During Meals in Fast Food Restaurants," Pediatrics, Mar.
+2014.
+\bibitem{key:3}
+ Hannes Holm, Mathias Ekstedt Theodor Sommestad, "Estimates of success rates of remote
+arbitrary code execution attacks," Information Management & Computer Security, vol. 20,
+no. 2, pp. 107-122, 2012.
+\bibitem{key:4}
+ Anthony Grimes et al. (2014, May) tryclojure. [Online]. https://tryclj.com/
+\bibitem{key:5}
+Yu-Wei Su, Chung-Chou Shen Jin-Shyan Lee, "A Comparative Study of Wireless
+Protocols: Bluetooth, UWB, ZigBee, and Wi-Fi," in Industrial Electronics Society, 2007.
+IECON 2007. 33rd Annual Conference of the IEEE, Taipei, 2007, pp. 46 - 51.
+
+\end{document}
